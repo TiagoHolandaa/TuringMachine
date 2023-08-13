@@ -1,0 +1,60 @@
+input: '11100+1'
+blank: ' '
+start state: first
+table:
+#region Tabela de estado
+  first:
+    [1]: {write: 1, R: second}
+    ' ': {L: check}
+  second:
+    [0]: {write: 0, R}
+    [1]: {write: 0, R: third}
+    +: {R: first}
+    ' ': {L: check}
+  third:
+    [0]: {write: 0, R} 
+    [1]: {write: 1, L: fourth}
+    +: {R: first}
+    ' ': {L: check}
+  fourth:
+    [0]: {write: 1, R: halt}
+  halt:
+    [1, 0]: {R}
+    +: {R: first}
+    ' ': {L: check}
+#endregion
+#region Soma
+  check:
+  #Verificando a operação
+    0: {write: c, L: have_0}
+    1: {write: c, L: have_1}
+    +: {write: ' ', L: rewrite}
+  have_0:
+    {[0,1]: L, +: {L: add_0}}
+  have_1: 
+    {[0,1]: L, +: {L: add_1}}
+  add_0:
+    [0,' ']: {write: O, R: back_0}
+    1      : {write: I, R: back_0}
+    [O,I]  : L
+  add_1:
+    [0,' ']: {write: I, R: back_1}
+    1      : {write: O, L: carry}
+    [O,I]  : L
+  carry:
+    [0,' ']: {write: 1, R: back_1}
+    1      : {write: 0, L}
+  back_0:
+    [0,1,O,I,+]: R
+    c: {write: 0, L: check}
+  back_1:
+    [0,1,O,I,+]: R
+    c: {write: 1, L: check}
+  rewrite:
+    O: {write: 0, L}
+    I: {write: 1, L}
+    [0,1]: L
+    ' ': {R: final}
+  final:
+  #endregion
+  
